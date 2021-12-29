@@ -3,10 +3,14 @@ const HtmlPlugin = require("html-webpack-plugin");
 const FilePlugin = require("./plugins/file");
 const resolve = (dir) => require("path").resolve(__dirname, dir);
 const isProd = false;
+
+const env = process.env.NODE_ENV;
+const is = (arr) => arr.includes(env);
+const getInput = () => `./src/${env}.js`
 module.exports = {
   target: "web",
   mode: isProd ? "production" : "development",
-  entry: "./src/index.js",
+  entry: getInput(),
   devtool: isProd ? false : "source-map",
   output: {
     path: resolve("./output"),
@@ -14,11 +18,11 @@ module.exports = {
     publicPath: "/",
   },
   plugins: [
-    new FilePlugin(),
+    is(['file']) && new FilePlugin(),
     new HtmlPlugin({
       template: resolve("src/tpl.html"),
     }),
-  ],
+  ].filter(Boolean),
   module: {
     rules: [
       {
